@@ -11,5 +11,10 @@ module.exports = {
             loader : 'babel'
         } ]
     },
-    externals : [ 'mosaic-adapters', 'mosaic-dataset', 'mosaic-intents' ]
+    externals : [
+        'promise',
+        'mosaic-adapters',
+        'mosaic-dataset',
+        'mosaic-intents'
+    ]
 };

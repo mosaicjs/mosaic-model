@@ -32,6 +32,7 @@
   "dependencies": {
     "mosaic-adapters": "^0.2.4",
     "mosaic-dataset": "^0.0.8",
-    "mosaic-intents": "^0.1.6"
+    "mosaic-intents": "^0.1.6",
+    "promise": "^7.0.3"
   }
 }

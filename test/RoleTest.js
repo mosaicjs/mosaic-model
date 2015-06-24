@@ -44,10 +44,10 @@ describe('Model.Role', function(){
     
     it('should provide right keys and hierarchies for user-defined roles', function() {
         class MyRole extends Role.Editor {}
-        expect(MyRole.key).to.eql('myrole');
-        expect(new MyRole().key).to.eql('myrole');
-        expect(MyRole.hierarchy).to.eql(['nobody', 'reader', 'editor', 'myrole']);
-        expect(new MyRole().hierarchy).to.eql(['nobody', 'reader', 'editor', 'myrole']);
+        expect(MyRole.key).to.eql('my-role');
+        expect(new MyRole().key).to.eql('my-role');
+        expect(MyRole.hierarchy).to.eql(['nobody', 'reader', 'editor', 'my-role']);
+        expect(new MyRole().hierarchy).to.eql(['nobody', 'reader', 'editor', 'my-role']);
     });
 
     

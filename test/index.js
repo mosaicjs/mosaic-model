@@ -7,4 +7,5 @@ require('./ModelEntityTest');
 require('./ResourceTest');
 require('./RoleTest');
 require('./SessionTest');
+require('./CommandTest');
 //require('./ModelTest');
