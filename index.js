@@ -1,5 +1,6 @@
 import ModelEntity from './lib/ModelEntity';
 
+import AccessRules from './lib/access/AccessRules';
 import Role from './lib/Role';
 import Command from './lib/Command';
 import Session from './lib/Session';
@@ -11,6 +12,7 @@ import Resource from './lib/Resource';
 export default {
     ModelEntity,
     // -----------------
+    AccessRules, 
     Role,
     Command,
     Session,

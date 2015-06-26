@@ -7,7 +7,7 @@
 		var a = typeof exports === 'object' ? factory(require("mosaic-dataset"), require("mosaic-intents"), require("mosaic-adapters")) : factory(root["mosaic-dataset"], root["mosaic-intents"], root["mosaic-adapters"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(this, function(__WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_8__, __WEBPACK_EXTERNAL_MODULE_9__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_3__, __WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -62,41 +62,46 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _libModelEntity = __webpack_require__(6);
+	var _libModelEntity = __webpack_require__(1);
 
 	var _libModelEntity2 = _interopRequireDefault(_libModelEntity);
 
-	var _libRole = __webpack_require__(10);
+	var _libAccessAccessRules = __webpack_require__(8);
+
+	var _libAccessAccessRules2 = _interopRequireDefault(_libAccessAccessRules);
+
+	var _libRole = __webpack_require__(6);
 
 	var _libRole2 = _interopRequireDefault(_libRole);
 
-	var _libCommand = __webpack_require__(12);
+	var _libCommand = __webpack_require__(9);
 
 	var _libCommand2 = _interopRequireDefault(_libCommand);
 
-	var _libSession = __webpack_require__(7);
+	var _libSession = __webpack_require__(2);
 
 	var _libSession2 = _interopRequireDefault(_libSession);
 
-	var _libWorkspace = __webpack_require__(1);
+	var _libWorkspace = __webpack_require__(10);
 
 	var _libWorkspace2 = _interopRequireDefault(_libWorkspace);
 
-	var _libProject = __webpack_require__(3);
+	var _libProject = __webpack_require__(11);
 
 	var _libProject2 = _interopRequireDefault(_libProject);
 
-	var _libFolder = __webpack_require__(4);
+	var _libFolder = __webpack_require__(12);
 
 	var _libFolder2 = _interopRequireDefault(_libFolder);
 
-	var _libResource = __webpack_require__(5);
+	var _libResource = __webpack_require__(13);
 
 	var _libResource2 = _interopRequireDefault(_libResource);
 
 	exports['default'] = {
 	    ModelEntity: _libModelEntity2['default'],
 	    // -----------------
+	    AccessRules: _libAccessAccessRules2['default'],
 	    Role: _libRole2['default'],
 	    Command: _libCommand2['default'],
 	    Session: _libSession2['default'],
@@ -119,6 +124,73 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var _Session = __webpack_require__(2);
+
+	var _Session2 = _interopRequireDefault(_Session);
+
+	var _TypeUtils = __webpack_require__(7);
+
+	var _TypeUtils2 = _interopRequireDefault(_TypeUtils);
+
+	/**
+	 * This mix-in adds to types the mandatory 'session' field as well as a
+	 * 'command()' method allowing to execute 
+	 */
+
+	var ModelEntity = (function () {
+	    function ModelEntity() {
+	        _classCallCheck(this, ModelEntity);
+	    }
+
+	    _createClass(ModelEntity, null, [{
+	        key: 'init',
+	        value: function init(obj, options) {
+	            for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+	                args[_key - 2] = arguments[_key];
+	            }
+
+	            options = options || {};
+	            obj.session = _TypeUtils2['default'].checkValue(options.session instanceof _Session2['default'], options.session, 'Session is not defined or has a bad type.');
+	        }
+	    }, {
+	        key: 'addTo',
+	        value: function addTo(Type) {
+	            _TypeUtils2['default'].defineTypeProperty(Type, 'session', true);
+	            Type.prototype.execute = function (CommandType, options, action) {
+	                var command = this.newAdapter(CommandType, options);
+	                // Try to notify about this command the target object itself
+	                if (typeof this.emit === 'function') {
+	                    command.hierarchy.reverse().forEach(function (commandKey) {
+	                        this.emit('command:' + commandKey, command);
+	                    }, this);
+	                }
+	                return this.session.execute(command, action);
+	            };
+	        }
+	    }]);
+
+	    return ModelEntity;
+	})();
+
+	exports['default'] = ModelEntity;
+	module.exports = exports['default'];
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -127,13 +199,737 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-	var _mosaicDataset = __webpack_require__(2);
+	var _mosaicDataset = __webpack_require__(3);
 
-	var _Project = __webpack_require__(3);
+	var _mosaicIntents = __webpack_require__(4);
+
+	var _mosaicAdapters = __webpack_require__(5);
+
+	var _Role = __webpack_require__(6);
+
+	var _Role2 = _interopRequireDefault(_Role);
+
+	var Session = (function (_Data) {
+	    function Session(options) {
+	        var _get2;
+
+	        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	            args[_key - 1] = arguments[_key];
+	        }
+
+	        _classCallCheck(this, Session);
+
+	        options = options || {};
+	        if (!options.adapters) {
+	            options.adapters = new _mosaicAdapters.AdapterManager();
+	        }
+	        (_get2 = _get(Object.getPrototypeOf(Session.prototype), 'constructor', this)).call.apply(_get2, [this, options].concat(args));
+	        (0, _mosaicIntents.Intents)(this);
+	        this.options = options;
+	        this.roles = {};
+	        this._registerRoles();
+	    }
+
+	    _inherits(Session, _Data);
+
+	    _createClass(Session, [{
+	        key: 'getRole',
+
+	        /**
+	         * Returns a Role object corresponding to the specified key. Could be
+	         * overloaded in subclasses to re-define possible roles.
+	         */
+	        value: function getRole(roleKey) {
+	            return this.roles[roleKey];
+	        }
+	    }, {
+	        key: 'registerRole',
+
+	        /** Registers a new user role in this session */
+	        value: function registerRole(role) {
+	            this.roles[role.key] = role;
+	        }
+	    }, {
+	        key: 'unregisterRole',
+
+	        /** Removes the specified role from this session */
+	        value: function unregisterRole(role) {
+	            delete this.roles[role.key];
+	        }
+	    }, {
+	        key: 'getRole',
+
+	        /**
+	         * Returns user's role by the specified role key. If there is no such a role
+	         * registered then this method returns the Role.Nobody.
+	         */
+	        value: function getRole(roleKey) {
+	            return this.roles[roleKey] || _Role2['default'].Nobody;
+	        }
+	    }, {
+	        key: '_registerRoles',
+	        value: function _registerRoles() {
+	            [_Role2['default'].Nobody, _Role2['default'].Reader, _Role2['default'].Editor, _Role2['default'].Admin].forEach(this.registerRole.bind(this));
+	        }
+	    }, {
+	        key: 'execute',
+	        value: function execute(command, action) {
+	            return this.runAction(command.key, command, (function () {
+	                this.checkCommandAccess(command);
+	                if (!command.handled) {
+	                    return action(command);
+	                }
+	            }).bind(this));
+	        }
+	    }, {
+	        key: 'checkCommandAccess',
+
+	        /**
+	         * Checks if the specified command has required rights level to be executed.
+	         */
+	        value: function checkCommandAccess(command) {
+	            var target = command.target;
+	            if (!target) return;
+
+	            function check(condition, msg) {
+	                if (!condition) {
+	                    // TODO: add messages i18n
+	                    throw new Error(msg || 'Access denied.');
+	                }
+	            }
+	            function containedIn(list, value) {
+	                var result = false;
+	                for (var i = 0, len = list ? list.length : 0; !result && i < len; i++) {
+	                    result = list[i] == value;
+	                }
+	                return result;
+	            }
+	            var allow = false;
+	            var deny = false;
+
+	            var roles = target['.roles'] || {};
+	            var access = target['.access'] || {};
+	            var role = this.getRole(roles[this.userId]);
+
+	            var commandKeys = command.hierarchy;
+	            while (!allow && !deny && commandKeys.length) {
+	                var commandKey = commandKeys.pop();
+
+	                var roleKeys = role.hierarchy;
+	                while (!allow && !deny && roleKeys.length) {
+	                    var roleKey = roleKeys.pop();
+
+	                    var accessRules = access[roleKey];
+	                    if (!accessRules) continue;
+	                    allow = containedIn(accessRules.allow, commandKey);
+	                    deny = containedIn(accessRules.deny, commandKey);
+	                }
+	            }
+
+	            // TODO: add messages i18n
+	            check(!deny, '[' + command.key + ']' + ' Access denied for the user "' + this.userId + '".');
+
+	            // TODO: add messages i18n
+	            check(!!allow, '[' + command.key + ']' + ' Access rules are not defined for the user "' + this.userId + '".');
+	        }
+	    }, {
+	        key: 'userId',
+	        get: function () {
+	            return this.options.userId;
+	        }
+	    }]);
+
+	    return Session;
+	})(_mosaicDataset.Data);
+
+	exports['default'] = Session;
+
+	_mosaicIntents.Intents.addTo(Session);
+	module.exports = exports['default'];
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_5__;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var _TypeUtils = __webpack_require__(7);
+
+	var _TypeUtils2 = _interopRequireDefault(_TypeUtils);
+
+	var Role = (function () {
+	    function Role() {
+	        _classCallCheck(this, Role);
+	    }
+
+	    _createClass(Role, [{
+	        key: 'key',
+	        get: function () {
+	            return _TypeUtils2['default'].getTypeKey(this);
+	        }
+	    }, {
+	        key: 'hierarchy',
+	        get: function () {
+	            return _TypeUtils2['default'].getTypeHierarchyKeys(this, Role);
+	        }
+	    }], [{
+	        key: 'key',
+	        get: function () {
+	            return _TypeUtils2['default'].getTypeKey(this);
+	        }
+	    }, {
+	        key: 'hierarchy',
+	        get: function () {
+	            return _TypeUtils2['default'].getTypeHierarchyKeys(this, Role);
+	        }
+	    }]);
+
+	    return Role;
+	})();
+
+	exports['default'] = Role;
+
+	var Nobody = (function (_Role) {
+	    function Nobody() {
+	        _classCallCheck(this, Nobody);
+
+	        if (_Role != null) {
+	            _Role.apply(this, arguments);
+	        }
+	    }
+
+	    _inherits(Nobody, _Role);
+
+	    return Nobody;
+	})(Role);
+
+	var Reader = (function (_Nobody) {
+	    function Reader() {
+	        _classCallCheck(this, Reader);
+
+	        if (_Nobody != null) {
+	            _Nobody.apply(this, arguments);
+	        }
+	    }
+
+	    _inherits(Reader, _Nobody);
+
+	    return Reader;
+	})(Nobody);
+
+	var Editor = (function (_Reader) {
+	    function Editor() {
+	        _classCallCheck(this, Editor);
+
+	        if (_Reader != null) {
+	            _Reader.apply(this, arguments);
+	        }
+	    }
+
+	    _inherits(Editor, _Reader);
+
+	    return Editor;
+	})(Reader);
+
+	var Admin = (function (_Editor) {
+	    function Admin() {
+	        _classCallCheck(this, Admin);
+
+	        if (_Editor != null) {
+	            _Editor.apply(this, arguments);
+	        }
+	    }
+
+	    _inherits(Admin, _Editor);
+
+	    return Admin;
+	})(Editor);
+
+	Role.Nobody = Nobody;
+	Role.Reader = Reader;
+	Role.Editor = Editor;
+	Role.Admin = Admin;
+	module.exports = exports['default'];
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = {
+	    getTypeKey: getTypeKey,
+	    getTypeHierarchy: getTypeHierarchy,
+	    getTypeHierarchyKeys: getTypeHierarchyKeys,
+	    defineTypeProperty: defineTypeProperty,
+
+	    notEmpty: notEmpty,
+	    checkValue: checkValue
+	};
+
+	var typeCounter = 0;
+	function convertTypeNameToKey(name) {
+	    var result = undefined;
+	    if (!!name) {
+	        result = name.replace(/([A-Z])/gm, function (match, str, pos) {
+	            str = str.toLowerCase();
+	            if (pos > 0) {
+	                str = '-' + str;
+	            }
+	            return str;
+	        });
+	    } else {
+	        result = 'type-' + typeCounter++;
+	    }
+	    return result;
+	}
+
+	var typeKey = Symbol['for']('typeKey');
+	function getFunctionTypeKey(type) {
+	    var key = undefined;
+	    if (type.hasOwnProperty(typeKey)) {
+	        key = type[typeKey];
+	    } else {
+	        key = convertTypeNameToKey(type.name);
+	        type[typeKey] = key;
+	    }
+	    return key;
+	}
+
+	function getTypeKey(role) {
+	    var result = undefined;
+	    if (typeof role === 'string') {
+	        result = role;
+	    } else {
+	        if (typeof role === 'function') {
+	            result = getFunctionTypeKey(role);
+	        } else {
+	            var proto = Object.getPrototypeOf(role);
+	            result = getFunctionTypeKey(proto.constructor);
+	        }
+	    }
+	    return result;
+	}
+
+	function getTypeHierarchyKeys(role, top) {
+	    return getTypeHierarchy(role, top).map(getTypeKey);
+	}
+
+	function getTypeHierarchy(role, top) {
+	    top = top || Object;
+	    var proto = undefined;
+	    if (typeof role === 'function') {
+	        proto = role.prototype;
+	    } else {
+	        proto = Object.getPrototypeOf(role);
+	    }
+	    var array = [];
+	    while (proto && proto.constructor !== top) {
+	        array.push(proto.constructor);
+	        proto = Object.getPrototypeOf(proto);
+	    }
+	    array.reverse();
+	    return array;
+	}
+
+	function defineTypeProperty(Type, key, immutable) {
+	    var _key = Symbol['for'](key);
+	    var options = {
+	        get: function get() {
+	            return this[_key];
+	        },
+	        enumerable: false, // It is not visible for "key in ..." iterators
+	        configurable: false // Can not be deleted
+	    };
+	    if (immutable) {
+	        options.set = function (value) {
+	            if (!!this[_key]) throw new Error('The "' + key + '" property can not be changed.');
+	            this[_key] = value;
+	        };
+	    } else {
+	        options.set = function (value) {
+	            this[_key] = value;
+	        };
+	    }
+	    Object.defineProperty(Type.prototype, key, options);
+	}
+
+	function notEmpty(value, msg) {
+	    return checkValue(!!value, value, msg);
+	}
+	function checkValue(test, value, msg) {
+	    if (!test) throw new Error(msg);
+	    return value;
+	}
+	module.exports = exports['default'];
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var _TypeUtils = __webpack_require__(7);
+
+	var _TypeUtils2 = _interopRequireDefault(_TypeUtils);
+
+	var AccessRules = (function () {
+	    /**
+	     * <pre>
+	     * {
+	     *     // Default access policy for all unknown role / command combinations
+	     *     defaultAccessPolicy : 'deny', // possible values: allow/deny or true/false
+	     * 
+	     *     // Default access rules
+	     *     '*' : {
+	     *         allow : [ 'read' ],
+	     *         deny : []
+	     *     },
+	     *     admin : {
+	     *         allow : [ 'create', 'read', 'update', 'delete' ],
+	     *         deny : []
+	     *     },
+	     *     editor : {
+	     *         allow : [ 'create', 'read', 'update' ],
+	     *         deny : [],
+	     *     },
+	     *     // Everything is forbidden for non-logged users
+	     *     nobody : {
+	     *         deny : [ 'create', 'read', 'update', 'delete' ]
+	     *     }
+	     * }
+	     * </pre>
+	     */
+
+	    function AccessRules(options) {
+	        _classCallCheck(this, AccessRules);
+
+	        this.access = options;
+	        this._rebuildIndex();
+	    }
+
+	    _createClass(AccessRules, [{
+	        key: 'allowActions',
+
+	        /**
+	         * Adds the specified actions to the list of allowed operations for this
+	         * role.
+	         */
+	        value: function allowActions(role, actions) {
+	            var list = this.access[role] || [];
+	            list = list.concat(actions || []);
+	            var index = {};
+	            list.forEach(function (action) {
+	                index[action] = true;
+	            });
+	            this.access[role] = Object.keys(index);
+	            this._rebuildIndex();
+	        }
+	    }, {
+	        key: 'checkAccess',
+
+	        /**
+	         * Checks if the a user with the specified identifier can execute an action
+	         * characterized by the specified command hierarchy.
+	         */
+	        value: function checkAccess(role, command) {
+	            var commandsHierarchy = _TypeUtils2['default'].getTypeHierarchyKeys(command);
+	            while (commandsHierarchy.length) {
+	                var commandKey = commandsHierarchy.pop();
+	                var roleHierarchy = _TypeUtils2['default'].getTypeHierarchyKeys(role);
+	                roleHierarchy.unshift('*');
+	                while (roleHierarchy.length) {
+	                    var roleKey = roleHierarchy.pop();
+	                    var indexKey = this._getIndexKey(roleKey, commandKey);
+	                    var access = this._index[indexKey];
+	                    if (access === true || access === false) return access;
+	                }
+	            }
+	            return this._getDefaultAccessPolicy();
+	        }
+	    }, {
+	        key: '_rebuildIndex',
+
+	        /**
+	         * Rebuilds an internal index allowing fast lookup for role-action
+	         * combinations.
+	         */
+	        value: function _rebuildIndex() {
+	            var _this = this;
+
+	            this._index = {};
+
+	            var _loop = function (role) {
+	                var rules = _this.access[role] || {};
+	                (rules.allow || []).forEach(function (action) {
+	                    var key = this._getIndexKey(role, action);
+	                    this._index[key] = true;
+	                }, _this);
+	                (rules.deny || []).forEach(function (action) {
+	                    var key = this._getIndexKey(role, action);
+	                    this._index[key] = false;
+	                }, _this);
+	            };
+
+	            for (var role in this.access) {
+	                _loop(role);
+	            }
+	        }
+	    }, {
+	        key: '_getIndexKey',
+
+	        /** Returns a unique index key for the role-action pair. */
+	        value: function _getIndexKey(role, action) {
+	            return role + '-' + action;
+	        }
+	    }, {
+	        key: '_getDefaultAccessPolicy',
+
+	        /**
+	         * Returns the default access policy applied when there is no other rules
+	         * for roles/commands combinations.
+	         */
+	        value: function _getDefaultAccessPolicy() {
+	            var p = this.access.defaultAccessPolicy;
+	            switch (p) {
+	                case 'deny':
+	                    return false;
+	                case 'allow':
+	                    return true;
+	                case true:
+	                    return true;
+	                case false:
+	                    return false;
+	            }
+	            return false;
+	        }
+	    }]);
+
+	    return AccessRules;
+	})();
+
+	exports['default'] = AccessRules;
+	module.exports = exports['default'];
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+	var _mosaicIntents = __webpack_require__(4);
+
+	var _TypeUtils = __webpack_require__(7);
+
+	var _TypeUtils2 = _interopRequireDefault(_TypeUtils);
+
+	/**
+	 * Commands are used to perform specific actions on objects. They are used as
+	 * adapters for other objects. It allows to re-define the default command
+	 * behaviour.
+	 */
+
+	var Command = (function (_Intent) {
+	    function Command(params, target, type) {
+	        _classCallCheck(this, Command);
+
+	        _get(Object.getPrototypeOf(Command.prototype), 'constructor', this).call(this, params);
+	        if (this.params && this.params.fields) {
+	            for (var field in this.params.fields) {
+	                if (this.params.fields.hasOwnProperty(field)) {
+	                    this[field] = this.params.fields[field];
+	                }
+	            }
+	        }
+	        this.target = target;
+	        this.commandType = type;
+	    }
+
+	    _inherits(Command, _Intent);
+
+	    _createClass(Command, [{
+	        key: 'execute',
+
+	        /**
+	         * This method should be overloaded in subclasses to perform real operations
+	         * on the target object.
+	         */
+	        value: function execute() {
+	            return true;
+	        }
+	    }, {
+	        key: 'key',
+	        get: function () {
+	            return _TypeUtils2['default'].getTypeKey(this);
+	        }
+	    }, {
+	        key: 'hierarchy',
+	        get: function () {
+	            return _TypeUtils2['default'].getTypeHierarchyKeys(this, Command);
+	        }
+	    }], [{
+	        key: 'key',
+	        get: function () {
+	            return _TypeUtils2['default'].getTypeKey(this);
+	        }
+	    }, {
+	        key: 'hierarchy',
+	        get: function () {
+	            return _TypeUtils2['default'].getTypeHierarchyKeys(this, Command);
+	        }
+	    }]);
+
+	    return Command;
+	})(_mosaicIntents.Intent);
+
+	exports['default'] = Command;
+
+	var Create = (function (_Command) {
+	    function Create() {
+	        _classCallCheck(this, Create);
+
+	        if (_Command != null) {
+	            _Command.apply(this, arguments);
+	        }
+	    }
+
+	    _inherits(Create, _Command);
+
+	    return Create;
+	})(Command);
+
+	var Read = (function (_Command2) {
+	    function Read() {
+	        _classCallCheck(this, Read);
+
+	        if (_Command2 != null) {
+	            _Command2.apply(this, arguments);
+	        }
+	    }
+
+	    _inherits(Read, _Command2);
+
+	    return Read;
+	})(Command);
+
+	var Update = (function (_Command3) {
+	    function Update() {
+	        _classCallCheck(this, Update);
+
+	        if (_Command3 != null) {
+	            _Command3.apply(this, arguments);
+	        }
+	    }
+
+	    _inherits(Update, _Command3);
+
+	    return Update;
+	})(Command);
+
+	var Delete = (function (_Command4) {
+	    function Delete() {
+	        _classCallCheck(this, Delete);
+
+	        if (_Command4 != null) {
+	            _Command4.apply(this, arguments);
+	        }
+	    }
+
+	    _inherits(Delete, _Command4);
+
+	    return Delete;
+	})(Command);
+
+	Command.Create = Create;
+	Command.Read = Read;
+	Command.Update = Update;
+	Command.Delete = Delete;
+	module.exports = exports['default'];
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+	var _mosaicDataset = __webpack_require__(3);
+
+	var _Project = __webpack_require__(11);
 
 	var _Project2 = _interopRequireDefault(_Project);
 
-	var _ModelEntity = __webpack_require__(6);
+	var _ModelEntity = __webpack_require__(1);
 
 	var _ModelEntity2 = _interopRequireDefault(_ModelEntity);
 
@@ -169,13 +965,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
-
-/***/ },
-/* 3 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -183,9 +973,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
-	var _bind = Function.prototype.bind;
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
@@ -195,145 +982,83 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-	var _Folder2 = __webpack_require__(4);
+	var _Folder2 = __webpack_require__(12);
 
 	var _Folder3 = _interopRequireDefault(_Folder2);
 
-	var _mosaicIntents = __webpack_require__(8);
+	var _mosaicIntents = __webpack_require__(4);
 
-	var _mosaicDataset = __webpack_require__(2);
+	var _mosaicDataset = __webpack_require__(3);
 
-	var _ModelEntity = __webpack_require__(6);
+	var _Command = __webpack_require__(9);
+
+	var _Command2 = _interopRequireDefault(_Command);
+
+	var _ModelEntity = __webpack_require__(1);
 
 	var _ModelEntity2 = _interopRequireDefault(_ModelEntity);
 
-	var Command = (function (_Intent) {
-	    function Command() {
-	        _classCallCheck(this, Command);
+	var _ProjectMembers = __webpack_require__(14);
 
-	        if (_Intent != null) {
-	            _Intent.apply(this, arguments);
-	        }
-	    }
-
-	    _inherits(Command, _Intent);
-
-	    return Command;
-	})(_mosaicIntents.Intent);
-
-	var Read = (function (_Command) {
-	    function Read() {
-	        _classCallCheck(this, Read);
-
-	        if (_Command != null) {
-	            _Command.apply(this, arguments);
-	        }
-	    }
-
-	    _inherits(Read, _Command);
-
-	    return Read;
-	})(Command);
-
-	var Update = (function (_Command2) {
-	    function Update() {
-	        _classCallCheck(this, Update);
-
-	        if (_Command2 != null) {
-	            _Command2.apply(this, arguments);
-	        }
-	    }
-
-	    _inherits(Update, _Command2);
-
-	    return Update;
-	})(Command);
-
-	var Create = (function (_Update) {
-	    function Create() {
-	        _classCallCheck(this, Create);
-
-	        if (_Update != null) {
-	            _Update.apply(this, arguments);
-	        }
-	    }
-
-	    _inherits(Create, _Update);
-
-	    return Create;
-	})(Update);
-
-	var Delete = (function (_Command3) {
-	    function Delete() {
-	        _classCallCheck(this, Delete);
-
-	        if (_Command3 != null) {
-	            _Command3.apply(this, arguments);
-	        }
-	    }
-
-	    _inherits(Delete, _Command3);
-
-	    return Delete;
-	})(Command);
+	var _ProjectMembers2 = _interopRequireDefault(_ProjectMembers);
 
 	// Operations on project roles
 
-	var ReadSecurityInfo = (function (_Read) {
+	var ReadSecurityInfo = (function (_Command$Read) {
 	    function ReadSecurityInfo() {
 	        _classCallCheck(this, ReadSecurityInfo);
 
-	        if (_Read != null) {
-	            _Read.apply(this, arguments);
+	        if (_Command$Read != null) {
+	            _Command$Read.apply(this, arguments);
 	        }
 	    }
 
-	    _inherits(ReadSecurityInfo, _Read);
+	    _inherits(ReadSecurityInfo, _Command$Read);
 
 	    return ReadSecurityInfo;
-	})(Read);
+	})(_Command2['default'].Read);
 
-	var UpdateSecurityInfo = (function (_Update2) {
+	var UpdateSecurityInfo = (function (_Command$Update) {
 	    function UpdateSecurityInfo() {
 	        _classCallCheck(this, UpdateSecurityInfo);
 
-	        if (_Update2 != null) {
-	            _Update2.apply(this, arguments);
+	        if (_Command$Update != null) {
+	            _Command$Update.apply(this, arguments);
 	        }
 	    }
 
-	    _inherits(UpdateSecurityInfo, _Update2);
+	    _inherits(UpdateSecurityInfo, _Command$Update);
 
 	    return UpdateSecurityInfo;
-	})(Update);
+	})(_Command2['default'].Update);
 
-	var CreateSecurityInfo = (function (_Create) {
+	var CreateSecurityInfo = (function (_Command$Create) {
 	    function CreateSecurityInfo() {
 	        _classCallCheck(this, CreateSecurityInfo);
 
-	        if (_Create != null) {
-	            _Create.apply(this, arguments);
+	        if (_Command$Create != null) {
+	            _Command$Create.apply(this, arguments);
 	        }
 	    }
 
-	    _inherits(CreateSecurityInfo, _Create);
+	    _inherits(CreateSecurityInfo, _Command$Create);
 
 	    return CreateSecurityInfo;
-	})(Create);
+	})(_Command2['default'].Create);
 
-	var DeleteSecurityInfo = (function (_Delete) {
+	var DeleteSecurityInfo = (function (_Command$Delete) {
 	    function DeleteSecurityInfo() {
 	        _classCallCheck(this, DeleteSecurityInfo);
 
-	        if (_Delete != null) {
-	            _Delete.apply(this, arguments);
+	        if (_Command$Delete != null) {
+	            _Command$Delete.apply(this, arguments);
 	        }
 	    }
 
-	    _inherits(DeleteSecurityInfo, _Delete);
+	    _inherits(DeleteSecurityInfo, _Command$Delete);
 
 	    return DeleteSecurityInfo;
-	})(Delete);
+	})(_Command2['default'].Delete);
 
 	var UpdateProjectAccess = (function (_UpdateSecurityInfo) {
 	    function UpdateProjectAccess() {
@@ -451,33 +1176,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// Operations on the project
 
-	var CreateProject = (function (_Command4) {
+	var CreateProject = (function (_Command$Create2) {
 	    function CreateProject() {
 	        _classCallCheck(this, CreateProject);
 
-	        if (_Command4 != null) {
-	            _Command4.apply(this, arguments);
+	        if (_Command$Create2 != null) {
+	            _Command$Create2.apply(this, arguments);
 	        }
 	    }
 
-	    _inherits(CreateProject, _Command4);
+	    _inherits(CreateProject, _Command$Create2);
 
 	    return CreateProject;
-	})(Command);
+	})(_Command2['default'].Create);
 
-	var UpdateProject = (function (_Command5) {
+	var UpdateProject = (function (_Command$Update2) {
 	    function UpdateProject() {
 	        _classCallCheck(this, UpdateProject);
 
-	        if (_Command5 != null) {
-	            _Command5.apply(this, arguments);
+	        if (_Command$Update2 != null) {
+	            _Command$Update2.apply(this, arguments);
 	        }
 	    }
 
-	    _inherits(UpdateProject, _Command5);
+	    _inherits(UpdateProject, _Command$Update2);
 
 	    return UpdateProject;
-	})(Command);
+	})(_Command2['default'].Update);
 
 	var RemoveProject = (function (_UpdateProject) {
 	    function RemoveProject() {
@@ -509,33 +1234,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// Resource operations
 
-	var CreateResource = (function (_Command6) {
+	var CreateResource = (function (_Command$Create3) {
 	    function CreateResource() {
 	        _classCallCheck(this, CreateResource);
 
-	        if (_Command6 != null) {
-	            _Command6.apply(this, arguments);
+	        if (_Command$Create3 != null) {
+	            _Command$Create3.apply(this, arguments);
 	        }
 	    }
 
-	    _inherits(CreateResource, _Command6);
+	    _inherits(CreateResource, _Command$Create3);
 
 	    return CreateResource;
-	})(Command);
+	})(_Command2['default'].Create);
 
-	var UpdateResource = (function (_Command7) {
+	var UpdateResource = (function (_Command$Update3) {
 	    function UpdateResource() {
 	        _classCallCheck(this, UpdateResource);
 
-	        if (_Command7 != null) {
-	            _Command7.apply(this, arguments);
+	        if (_Command$Update3 != null) {
+	            _Command$Update3.apply(this, arguments);
 	        }
 	    }
 
-	    _inherits(UpdateResource, _Command7);
+	    _inherits(UpdateResource, _Command$Update3);
 
 	    return UpdateResource;
-	})(Command);
+	})(_Command2['default'].Update);
 
 	var DeleteResource = (function (_UpdateResource) {
 	    function DeleteResource() {
@@ -603,116 +1328,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// class LoggedUser extends Nobody {}  // Automatic role
 
-	var User = function User() {
-	    for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-	        args[_key5] = arguments[_key5];
-	    }
-
-	    _classCallCheck(this, User);
-	};
-
-	/**
-	 * Each project member has the same identifiers as users. 
-	 */
-
-	var ProjectMember = (function (_Data) {
-	    function ProjectMember(options) {
+	var Project = (function (_Folder) {
+	    function Project(options) {
 	        var _get2;
 
 	        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
 	            args[_key - 1] = arguments[_key];
 	        }
 
-	        _classCallCheck(this, ProjectMember);
-
-	        (_get2 = _get(Object.getPrototypeOf(ProjectMember.prototype), 'constructor', this)).call.apply(_get2, [this, options].concat(args));
-	        _ModelEntity2['default'].init(this, options);
-
-	        var roleKey = (this.data || {}).role;
-	        this.role = this.session.getRole(roleKey);
-	    }
-
-	    _inherits(ProjectMember, _Data);
-
-	    return ProjectMember;
-	})(_mosaicDataset.Data);
-
-	_ModelEntity2['default'].addTo(ProjectMember);
-
-	var ProjectMembers = (function (_DataSet) {
-	    function ProjectMembers(options) {
-	        var _get3;
-
-	        for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-	            args[_key2 - 1] = arguments[_key2];
-	        }
-
-	        _classCallCheck(this, ProjectMembers);
-
-	        (_get3 = _get(Object.getPrototypeOf(ProjectMembers.prototype), 'constructor', this)).call.apply(_get3, [this, options].concat(args));
-	        _ModelEntity2['default'].init(this, options);
-	    }
-
-	    _inherits(ProjectMembers, _DataSet);
-
-	    _createClass(ProjectMembers, [{
-	        key: 'DataType',
-	        get: function () {
-	            return ProjectMember;
-	        }
-	    }]);
-
-	    return ProjectMembers;
-	})(_mosaicDataset.DataSet);
-
-	_ModelEntity2['default'].addTo(ProjectMembers);
-
-	var Project = (function (_Folder) {
-	    function Project(options) {
-	        var _get4;
-
-	        for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-	            args[_key3 - 1] = arguments[_key3];
-	        }
-
 	        _classCallCheck(this, Project);
 
-	        (_get4 = _get(Object.getPrototypeOf(Project.prototype), 'constructor', this)).call.apply(_get4, [this, options].concat(args));
-	        this.members = new ProjectMembers();
+	        (_get2 = _get(Object.getPrototypeOf(Project.prototype), 'constructor', this)).call.apply(_get2, [this, options].concat(args));
+	        this.members = this.getAdapter(_ProjectMembers2['default'], options);
 	        this.members.items = this.data.members;
 	    }
 
 	    _inherits(Project, _Folder);
-
-	    _createClass(Project, [{
-	        key: 'execute',
-	        value: function execute(CommandType) {
-	            for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-	                args[_key4 - 1] = arguments[_key4];
-	            }
-
-	            var role = this.getUserRole();
-	            var command = new (_bind.apply(CommandType, [null].concat([this], args)))();
-	            return role.execute(command);
-	        }
-	    }, {
-	        key: 'getUserRole',
-
-	        /**
-	         * Returns the role of the current user in this project.
-	         */
-	        value: function getUserRole() {
-	            var user = this.getCurrentUser();
-	            var userId = user;
-	            return;
-	        }
-	    }, {
-	        key: 'members',
-	        get: function () {}
-	    }, {
-	        key: 'roles',
-	        get: function () {}
-	    }]);
 
 	    return Project;
 	})(_Folder3['default']);
@@ -721,7 +1352,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 4 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -740,15 +1371,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-	var _mosaicDataset = __webpack_require__(2);
+	var _mosaicDataset = __webpack_require__(3);
 
-	var _Resource = __webpack_require__(5);
+	var _Resource = __webpack_require__(13);
 
 	var _Resource2 = _interopRequireDefault(_Resource);
 
-	var _ModelEntity = __webpack_require__(6);
+	var _ModelEntity = __webpack_require__(1);
 
 	var _ModelEntity2 = _interopRequireDefault(_ModelEntity);
+
+	// Access control:
+	// - resource: read resource
+	// - folder: read list of folder elements
+	// - resource: update resource (change data) and save it
+	// - folder: create a new element in a folder (add a resource)
+	// - workspace: create a new project
+	// - folder: remove a resource
+	// -
 
 	var Folder = (function (_DataSet) {
 	    function Folder(options) {
@@ -782,7 +1422,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 5 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -795,7 +1435,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-	var _mosaicDataset = __webpack_require__(2);
+	var _mosaicDataset = __webpack_require__(3);
 
 	var Resource = (function (_Data) {
 	  function Resource() {
@@ -815,68 +1455,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	var _Session = __webpack_require__(7);
-
-	var _Session2 = _interopRequireDefault(_Session);
-
-	var _TypeUtils = __webpack_require__(11);
-
-	var _TypeUtils2 = _interopRequireDefault(_TypeUtils);
-
-	/**
-	 * This mix-in adds to types the mandatory 'session' field as well as a
-	 * 'command()' method allowing to execute 
-	 */
-
-	var ModelEntity = (function () {
-	    function ModelEntity() {
-	        _classCallCheck(this, ModelEntity);
-	    }
-
-	    _createClass(ModelEntity, null, [{
-	        key: 'init',
-	        value: function init(obj, options) {
-	            for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-	                args[_key - 2] = arguments[_key];
-	            }
-
-	            options = options || {};
-	            obj.session = _TypeUtils2['default'].checkValue(options.session instanceof _Session2['default'], options.session, 'Session is not defined or has a bad type.');
-	        }
-	    }, {
-	        key: 'addTo',
-	        value: function addTo(Type) {
-	            _TypeUtils2['default'].defineTypeProperty(Type, 'session', true);
-	            Type.prototype.execute = function (CommandType, options) {
-	                var command = this.newAdapter(CommandType, options);
-	                return this.session.execute(command);
-	            };
-	        }
-	    }]);
-
-	    return ModelEntity;
-	})();
-
-	exports['default'] = ModelEntity;
-	module.exports = exports['default'];
-
-/***/ },
-/* 7 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -895,535 +1474,119 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-	var _mosaicDataset = __webpack_require__(2);
+	var _mosaicDataset = __webpack_require__(3);
 
-	var _mosaicIntents = __webpack_require__(8);
+	var _ModelEntity = __webpack_require__(1);
 
-	var _mosaicAdapters = __webpack_require__(9);
+	var _ModelEntity2 = _interopRequireDefault(_ModelEntity);
 
-	var _Role = __webpack_require__(10);
+	var _ProjectMember = __webpack_require__(15);
 
-	var _Role2 = _interopRequireDefault(_Role);
+	var _ProjectMember2 = _interopRequireDefault(_ProjectMember);
 
-	var Session = (function (_Data) {
-	    function Session(options) {
+	var ProjectMembers = (function (_DataSet) {
+	    function ProjectMembers(options, project, type) {
+	        _classCallCheck(this, ProjectMembers);
+
+	        _get(Object.getPrototypeOf(ProjectMembers.prototype), 'constructor', this).call(this, options, project, type);
+	        this.project = project;
+	        _ModelEntity2['default'].init(this, options);
+	    }
+
+	    _inherits(ProjectMembers, _DataSet);
+
+	    _createClass(ProjectMembers, [{
+	        key: 'getMembersByRole',
+
+	        /**
+	         * Returns a list of all members corresponding to the specified role.
+	         */
+	        value: function getMembersByRole(role) {
+	            var result = [];
+	            this.items.forEach(function (member) {
+	                if (member.role === role) {
+	                    result.push(member);
+	                }
+	            });
+	            return result;
+	        }
+	    }, {
+	        key: 'DataType',
+	        get: function () {
+	            return _ProjectMember2['default'];
+	        }
+	    }]);
+
+	    return ProjectMembers;
+	})(_mosaicDataset.DataSet);
+
+	exports['default'] = ProjectMembers;
+
+	_ModelEntity2['default'].addTo(ProjectMembers);
+	module.exports = exports['default'];
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+	var _mosaicDataset = __webpack_require__(3);
+
+	var _ModelEntity = __webpack_require__(1);
+
+	var _ModelEntity2 = _interopRequireDefault(_ModelEntity);
+
+	/**
+	 * Each project member has the same identifiers as users.
+	 */
+
+	var ProjectMember = (function (_Data) {
+	    function ProjectMember(options) {
 	        var _get2;
 
 	        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
 	            args[_key - 1] = arguments[_key];
 	        }
 
-	        _classCallCheck(this, Session);
+	        _classCallCheck(this, ProjectMember);
 
-	        options = options || {};
-	        if (!options.adapters) {
-	            options.adapters = new _mosaicAdapters.AdapterManager();
-	        }
-	        (_get2 = _get(Object.getPrototypeOf(Session.prototype), 'constructor', this)).call.apply(_get2, [this, options].concat(args));
-	        (0, _mosaicIntents.Intents)(this);
-	        this.options = options;
-	        this.roles = {};
-	        this._registerRoles();
+	        (_get2 = _get(Object.getPrototypeOf(ProjectMember.prototype), 'constructor', this)).call.apply(_get2, [this, options].concat(args));
+	        _ModelEntity2['default'].init(this, options);
+
+	        var roleKey = (this.data || {}).role;
+	        this.role = this.session.getRole(roleKey);
 	    }
 
-	    _inherits(Session, _Data);
+	    _inherits(ProjectMember, _Data);
 
-	    _createClass(Session, [{
-	        key: 'getRole',
-
-	        /**
-	         * Returns a Role object corresponding to the specified key. Could be
-	         * overloaded in subclasses to re-define possible roles.
-	         */
-	        value: function getRole(roleKey) {
-	            return this.roles[roleKey];
-	        }
-	    }, {
-	        key: 'registerRole',
-
-	        /** Registers a new user role in this session */
-	        value: function registerRole(role) {
-	            this.roles[role.key] = role;
-	        }
-	    }, {
-	        key: 'unregisterRole',
-
-	        /** Removes the specified role from this session */
-	        value: function unregisterRole(role) {
-	            delete this.roles[role.key];
-	        }
-	    }, {
-	        key: 'getRole',
-
-	        /**
-	         * Returns user's role by the specified role key. If there is no such a role
-	         * registered then this method returns the Role.Nobody.
-	         */
-	        value: function getRole(roleKey) {
-	            return this.roles[roleKey] || _Role2['default'].Nobody;
-	        }
-	    }, {
-	        key: '_registerRoles',
-	        value: function _registerRoles() {
-	            [_Role2['default'].Nobody, _Role2['default'].Reader, _Role2['default'].Editor, _Role2['default'].Admin].forEach(this.registerRole.bind(this));
-	        }
-	    }, {
-	        key: 'execute',
-	        value: function execute(command) {
-	            return this.runAction(command.key, command, (function () {
-	                this.checkCommandAccess(command);
-	                return command.execute();
-	            }).bind(this));
-	        }
-	    }, {
-	        key: 'checkCommandAccess',
-
-	        /**
-	         * Checks if the specified command has required rights level to be executed.
-	         */
-	        value: function checkCommandAccess(command) {
-	            var target = command.target;
-	            function check(condition, msg) {
-	                if (!condition) {
-	                    // TODO: add messages i18n
-	                    throw new Error(msg || 'Access denied.');
-	                }
-	            }
-	            function containedIn(list, value) {
-	                var result = false;
-	                for (var i = 0, len = list ? list.length : 0; !result && i < len; i++) {
-	                    result = list[i] == value;
-	                }
-	                return result;
-	            }
-	            var allow = false;
-	            var deny = false;
-
-	            if (target) {
-	                var roles = target['.roles'] || {};
-	                var access = target['.access'] || {};
-	                var role = this.getRole(roles[this.userId]);
-
-	                var commandKeys = command.hierarchy;
-	                while (!allow && !deny && commandKeys.length) {
-	                    var commandKey = commandKeys.pop();
-
-	                    var roleKeys = role.hierarchy;
-	                    while (!allow && !deny && roleKeys.length) {
-	                        var roleKey = roleKeys.pop();
-
-	                        var accessRules = access[roleKey];
-	                        if (!accessRules) continue;
-	                        allow = containedIn(accessRules.allow, commandKey);
-	                        deny = containedIn(accessRules.deny, commandKey);
-	                    }
-	                }
-
-	                // TODO: add messages i18n
-	                check(!deny, '[' + command.key + ']' + ' Access denied for the user "' + this.userId + '".');
-
-	                // TODO: add messages i18n
-	                check(!!allow, '[' + command.key + ']' + ' Access rules are not defined for the user "' + this.userId + '".');
-	            }
-	        }
-	    }, {
-	        key: 'userId',
+	    _createClass(ProjectMember, [{
+	        key: 'project',
 	        get: function () {
-	            return this.options.userId;
+	            return this.dataSet /* ProjectMembers */.project;
 	        }
 	    }]);
 
-	    return Session;
+	    return ProjectMember;
 	})(_mosaicDataset.Data);
 
-	exports['default'] = Session;
+	exports['default'] = ProjectMember;
 
-	_mosaicIntents.Intents.addTo(Session);
-	module.exports = exports['default'];
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_8__;
-
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_9__;
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	var _TypeUtils = __webpack_require__(11);
-
-	var _TypeUtils2 = _interopRequireDefault(_TypeUtils);
-
-	var Role = (function () {
-	    function Role() {
-	        _classCallCheck(this, Role);
-	    }
-
-	    _createClass(Role, [{
-	        key: 'key',
-	        get: function () {
-	            return _TypeUtils2['default'].getTypeKey(this);
-	        }
-	    }, {
-	        key: 'hierarchy',
-	        get: function () {
-	            return _TypeUtils2['default'].getTypeHierarchyKeys(this, Role);
-	        }
-	    }], [{
-	        key: 'key',
-	        get: function () {
-	            return _TypeUtils2['default'].getTypeKey(this);
-	        }
-	    }, {
-	        key: 'hierarchy',
-	        get: function () {
-	            return _TypeUtils2['default'].getTypeHierarchyKeys(this, Role);
-	        }
-	    }]);
-
-	    return Role;
-	})();
-
-	exports['default'] = Role;
-
-	var Nobody = (function (_Role) {
-	    function Nobody() {
-	        _classCallCheck(this, Nobody);
-
-	        if (_Role != null) {
-	            _Role.apply(this, arguments);
-	        }
-	    }
-
-	    _inherits(Nobody, _Role);
-
-	    return Nobody;
-	})(Role);
-
-	var Reader = (function (_Nobody) {
-	    function Reader() {
-	        _classCallCheck(this, Reader);
-
-	        if (_Nobody != null) {
-	            _Nobody.apply(this, arguments);
-	        }
-	    }
-
-	    _inherits(Reader, _Nobody);
-
-	    return Reader;
-	})(Nobody);
-
-	var Editor = (function (_Reader) {
-	    function Editor() {
-	        _classCallCheck(this, Editor);
-
-	        if (_Reader != null) {
-	            _Reader.apply(this, arguments);
-	        }
-	    }
-
-	    _inherits(Editor, _Reader);
-
-	    return Editor;
-	})(Reader);
-
-	var Admin = (function (_Editor) {
-	    function Admin() {
-	        _classCallCheck(this, Admin);
-
-	        if (_Editor != null) {
-	            _Editor.apply(this, arguments);
-	        }
-	    }
-
-	    _inherits(Admin, _Editor);
-
-	    return Admin;
-	})(Editor);
-
-	Role.Nobody = Nobody;
-	Role.Reader = Reader;
-	Role.Editor = Editor;
-	Role.Admin = Admin;
-	module.exports = exports['default'];
-
-/***/ },
-/* 11 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	exports['default'] = {
-	    getTypeKey: getTypeKey,
-	    getTypeHierarchy: getTypeHierarchy,
-	    getTypeHierarchyKeys: getTypeHierarchyKeys,
-	    defineTypeProperty: defineTypeProperty,
-
-	    notEmpty: notEmpty,
-	    checkValue: checkValue
-	};
-
-	var typeCounter = 0;
-	function convertTypeNameToKey(name) {
-	    var result = undefined;
-	    if (!!name) {
-	        result = name.replace(/([A-Z])/gm, function (match, str, pos) {
-	            str = str.toLowerCase();
-	            if (pos > 0) {
-	                str = '-' + str;
-	            }
-	            return str;
-	        });
-	    } else {
-	        result = 'type-' + typeCounter++;
-	    }
-	    return result;
-	}
-
-	var typeKey = Symbol['for']('typeKey');
-	function getFunctionTypeKey(type) {
-	    var key = undefined;
-	    if (type.hasOwnProperty(typeKey)) {
-	        key = type[typeKey];
-	    } else {
-	        key = convertTypeNameToKey(type.name);
-	        type[typeKey] = key;
-	    }
-	    return key;
-	}
-
-	function getTypeKey(role) {
-	    var result = undefined;
-	    if (typeof role === 'string') {
-	        result = role;
-	    } else {
-	        if (typeof role === 'function') {
-	            result = getFunctionTypeKey(role);
-	        } else {
-	            var proto = Object.getPrototypeOf(role);
-	            result = getFunctionTypeKey(proto.constructor);
-	        }
-	    }
-	    return result;
-	}
-
-	function getTypeHierarchyKeys(role, top) {
-	    return getTypeHierarchy(role, top).map(getTypeKey);
-	}
-
-	function getTypeHierarchy(role, top) {
-	    top = top || Object;
-	    var proto = undefined;
-	    if (typeof role === 'function') {
-	        proto = role.prototype;
-	    } else {
-	        proto = Object.getPrototypeOf(role);
-	    }
-	    var array = [];
-	    while (proto && proto.constructor !== top) {
-	        array.push(proto.constructor);
-	        proto = Object.getPrototypeOf(proto);
-	    }
-	    array.reverse();
-	    return array;
-	}
-
-	function defineTypeProperty(Type, key, immutable) {
-	    var _key = Symbol['for'](key);
-	    var options = {
-	        get: function get() {
-	            return this[_key];
-	        },
-	        enumerable: false, // It is not visible for "key in ..." iterators
-	        configurable: false // Can not be deleted
-	    };
-	    if (immutable) {
-	        options.set = function (value) {
-	            if (!!this[_key]) throw new Error('The "' + key + '" property can not be changed.');
-	            this[_key] = value;
-	        };
-	    } else {
-	        options.set = function (value) {
-	            this[_key] = value;
-	        };
-	    }
-	    Object.defineProperty(Type.prototype, key, options);
-	}
-
-	function notEmpty(value, msg) {
-	    return checkValue(!!value, value, msg);
-	}
-	function checkValue(test, value, msg) {
-	    if (!test) throw new Error(msg);
-	    return value;
-	}
-	module.exports = exports['default'];
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
-
-	var _mosaicIntents = __webpack_require__(8);
-
-	var _TypeUtils = __webpack_require__(11);
-
-	var _TypeUtils2 = _interopRequireDefault(_TypeUtils);
-
-	/**
-	 * Commands are used to perform specific actions on objects. They are used as
-	 * adapters for other objects. It allows to re-define the default command
-	 * behaviour.
-	 */
-
-	var Command = (function (_Intent) {
-	  function Command(options, target, type) {
-	    _classCallCheck(this, Command);
-
-	    _get(Object.getPrototypeOf(Command.prototype), 'constructor', this).call(this, options);
-	    this.target = target;
-	    this.commandType = type;
-	  }
-
-	  _inherits(Command, _Intent);
-
-	  _createClass(Command, [{
-	    key: 'execute',
-
-	    /**
-	     * This method should be overloaded in subclasses to perform real operations
-	     * on the target object.
-	     */
-	    value: function execute() {
-	      return true;
-	    }
-	  }, {
-	    key: 'key',
-	    get: function () {
-	      return _TypeUtils2['default'].getTypeKey(this);
-	    }
-	  }, {
-	    key: 'hierarchy',
-	    get: function () {
-	      return _TypeUtils2['default'].getTypeHierarchyKeys(this, Command);
-	    }
-	  }], [{
-	    key: 'key',
-	    get: function () {
-	      return _TypeUtils2['default'].getTypeKey(this);
-	    }
-	  }, {
-	    key: 'hierarchy',
-	    get: function () {
-	      return _TypeUtils2['default'].getTypeHierarchyKeys(this, Command);
-	    }
-	  }]);
-
-	  return Command;
-	})(_mosaicIntents.Intent);
-
-	exports['default'] = Command;
-
-	var Create = (function (_Command) {
-	  function Create() {
-	    _classCallCheck(this, Create);
-
-	    if (_Command != null) {
-	      _Command.apply(this, arguments);
-	    }
-	  }
-
-	  _inherits(Create, _Command);
-
-	  return Create;
-	})(Command);
-
-	var Read = (function (_Command2) {
-	  function Read() {
-	    _classCallCheck(this, Read);
-
-	    if (_Command2 != null) {
-	      _Command2.apply(this, arguments);
-	    }
-	  }
-
-	  _inherits(Read, _Command2);
-
-	  return Read;
-	})(Command);
-
-	var Update = (function (_Command3) {
-	  function Update() {
-	    _classCallCheck(this, Update);
-
-	    if (_Command3 != null) {
-	      _Command3.apply(this, arguments);
-	    }
-	  }
-
-	  _inherits(Update, _Command3);
-
-	  return Update;
-	})(Command);
-
-	var Delete = (function (_Command4) {
-	  function Delete() {
-	    _classCallCheck(this, Delete);
-
-	    if (_Command4 != null) {
-	      _Command4.apply(this, arguments);
-	    }
-	  }
-
-	  _inherits(Delete, _Command4);
-
-	  return Delete;
-	})(Command);
-
-	Command.Create = Create;
-	Command.Read = Read;
-	Command.Update = Update;
-	Command.Delete = Delete;
+	_ModelEntity2['default'].addTo(ProjectMember);
 	module.exports = exports['default'];
 
 /***/ }
