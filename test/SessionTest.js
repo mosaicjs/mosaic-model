@@ -18,12 +18,12 @@ describe('Model.Session', function(){
         expect(session.userId).to.be('john.smith');
     });
     it('should execute commands', function(done) {
-        class MyCommand extends Model.Command.Update {
-            execute(){ return 'Hello, ' + this.params.msg + '!'; }
-        }
+        class MyCommand extends Model.Command.Update {}
         let session = new Model.Session({ userId : 'john.smith' });
         let command = new MyCommand({ msg: 'World' });
-        session.execute(command).then(function(result){
+        session.execute(command, function(command){
+            return 'Hello, ' + command.params.msg + '!';
+        }).then(function(result){
             expect(result).to.eql('Hello, World!');
         }).then(done, done);
     });
@@ -33,12 +33,7 @@ describe('Model.Session', function(){
         class SpecialRole extends Model.Role { }
         // A new command updating the 'message' field of the target object and 
         // returning this value.
-        class MyCommand extends Model.Command.Update {
-            execute(){
-                this.target.message = 'Hello, ' + this.params.msg + '!';
-                return this.target.message;
-            }
-        }
+        class MyCommand extends Model.Command.Update {}
         
         // Create a new session and register this role in the session.
         // Now it become available for the session by its key.
@@ -53,8 +48,8 @@ describe('Model.Session', function(){
                 // Rules for our new SpecialRole
                 'special-role' : {
                     // It allows 'update' operations. 
-                    // And our test commands will inherit from the 'update'.
-                    // So it should work.
+                    // And our test command inherits from the 'update' command,
+                    // so it should work.
                     allow: ['update']
                 }
             }
@@ -62,7 +57,10 @@ describe('Model.Session', function(){
         Promise.resolve().then(function(){
             let command = new MyCommand({ msg: 'World' }, obj);
             expect(obj.message).to.be(undefined);
-            return session.execute(command).then(function(result){
+            return session.execute(command, function(command){
+                command.target.message = 'Hello, ' + command.params.msg + '!';
+                return command.target.message;
+            }).then(function(result){
                 expect(result).to.eql('Hello, World!');
                 expect(obj.message).to.eql('Hello, World!');
             })            
@@ -73,9 +71,13 @@ describe('Model.Session', function(){
             let command = new MyCommand({ msg: 'World' }, obj);
             delete obj.message;
             expect(obj.message).to.be(undefined);
-            return session.execute(command).then(function(result){
+            return session.execute(command, function(command){
+                command.target.message = 'Hello, ' + command.params.msg + '!';
+                return command.target.message;
+            }).then(function(result){
                 expect().fail();
             }, function(err){
+                expect(obj.message).to.be(undefined);
                 expect(err.message).to.eql('[my-command] Access denied for the user "john.smith".')
             });
         }).then(done, done);
